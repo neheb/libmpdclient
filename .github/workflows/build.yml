@@ -86,7 +86,7 @@ jobs:
         with:
           action: build
           directory: output
-          setup-options: -Ddocumentation=false
+          setup-options: -Ddocumentation=false -Dtest=true
           options: --verbose
           meson-version: 1.3.0
 
@@ -104,6 +104,32 @@ jobs:
         with:
           action: build
           directory: output
-          setup-options: -Ddocumentation=false
+          setup-options: -Ddocumentation=false -Dtest=true
           options: --verbose
           meson-version: 1.3.0
+  build-msys2:
+    strategy:
+      matrix:
+        platform: ['MINGW64', 'UCRT64']
+    defaults:
+      run:
+        shell: msys2 {0}
+    runs-on: windows-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.platform}}
+          pacboy: >-
+            cc:p
+            check:p
+            meson:p
+            ninja:p
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dtest=true -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose

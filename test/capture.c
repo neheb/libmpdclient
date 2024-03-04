@@ -11,6 +11,7 @@
 
 #ifdef _WIN32
 #  include <winsock2.h>
+#  include <io.h>
 #  include <basetsd.h> /* for SSIZE_T */
 typedef SSIZE_T ssize_t;
 #else
